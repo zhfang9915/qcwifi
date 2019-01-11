@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.PaymentsDetailsDao">
+
+	<!-- ######################		基础操作		######################### -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into payments_details(
+			user_id,
+			transaction_serial,
+			transaction_money,
+			transaction_type,
+			remarks,
+			create_time
+		) 
+		values(
+			#{userId}, 
+			#{transaction_serial},
+			#{transaction_money},
+			#{transaction_type},
+			#{remarks},
+			now()
+		)
+	</insert>
+	
+	<!-- 查询固件列表的条件sql -->
+	<sql id="queryPaymentsDetailsCondition">
+		<where>
+			1=1
+			<if test="id != null and id != ''">
+				and id=#{id, jdbcType=TINYINT}
+			</if>
+			<if test="userId != null and userId != ''">
+				and user_id=#{userId, jdbcType=TINYINT}
+			</if>
+			<if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+		       	and create_time between str_to_date(#{startTime}, '%Y-%m-%d %H:%i:%s') and str_to_date(#{endTime}, '%Y-%m-%d %H:%i:%s')
+		    </if>
+		</where>
+	</sql>
+
+	<!-- 根据id获取明细-->
+	<select id="selectById" resultType="ltd.qcwifi.model.entity.cloud.PaymentsDetails">
+		select * from payments_details where id=#{id}
+	</select>
+	
+	<!-- 根据user_id获取明细-->
+	<select id="selectByUserId" parameterType="ltd.qcwifi.model.dto.param.PaymentsDetailsParam" resultType="ltd.qcwifi.model.entity.cloud.PaymentsDetails">
+		select * from payments_details 
+		<include refid="queryPaymentsDetailsCondition"/>
+		order by create_time desc
+		limit #{offset}, #{limit}
+	</select>
+	
+	<select id="selectCount" parameterType="ltd.qcwifi.model.dto.param.PaymentsDetailsParam" resultType="java.lang.Integer">
+		select count(0) from payments_details
+		<include refid="queryPaymentsDetailsCondition"/>
+	</select>
+
+	<!-- 根据id更新余额字段 -->
+	<update id="updateById">
+		update 
+			payments_details
+		set
+			transaction_serial=#{transaction_serial},
+			transaction_money=#{transaction_money},
+			transaction_type=#{transaction_type},
+			remarks=#{remarks}
+		where
+			id=#{id}
+	</update>
+	
+</mapper>

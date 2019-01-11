@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ltd.qcwifi.jobs.dao.JobsDao">
+	<!-- 添加任务 -->
+
+	<insert id="addJobs" parameterType="ltd.qcwifi.jobs.model.Jobs">
+		insert into backend_jobs
+		(
+			f_Id,
+			f_name,
+			f_SCHEDUAL_TIME,
+			f_CURRENTSTATUS,
+			f_CLASSNAME,
+			f_JOBDESC
+		)
+		values
+		(
+			#{fId},
+			#{fName},
+			#{fSchedualTime},
+			#{fCurrentStatus},
+			#{fClassName},
+			#{fJobDesc}
+		);
+	</insert>
+	
+	<!-- 移除任务 -->
+	<delete id="removeJobs" parameterType="String">
+		delete from backend_jobs where f_id in (
+		<foreach collection="array" item="fId" separator=",">
+			#{fId}
+		</foreach>
+		)
+	</delete>
+
+	<!-- 更改任务 -->
+	<update id="updateJobs" parameterType="HashMap">
+		update backend_jobs
+		<set>
+			<if test="fName!=null and fName!=''">
+				f_name=#{fName},
+			</if>
+			<if test="fSchedualTime!=null and fSchedualTime!=''">
+				f_Schedual_Time=#{fSchedualTime},
+			</if>
+			<if test="fCurrentStatus!=null and fCurrentStatus!=''">
+				f_CurrentStatus=#{fCurrentStatus},
+			</if>
+			<if test="fClassName!=null and fClassName!=''">
+				f_ClassName=#{fClassName},
+			</if>
+			<if test="fJobDesc!=null and fJobDesc!=''">
+				f_JobDesc=#{fJobDesc}
+			</if>
+		</set>
+		<where>
+			f_id=#{fId}
+		</where>
+	</update>
+
+	<!-- 根据fId查询任务 -->
+	<select id="searchJobsById" parameterType="String" resultType="ltd.qcwifi.jobs.model.Jobs">
+		SELECT
+		f_id fId,
+		f_name fName,
+		f_schedual_time fSchedualTime,
+		f_currentStatus fCurrentStatus,
+		f_classname fClassName,
+		f_jobDesc
+		fJobDesc
+		FROM
+		backend_jobs
+		where f_id = #{fId}
+	</select>
+	
+	<!-- 查询任务（模糊） -->
+	<select id="searchJobs" parameterType="HashMap"
+		resultType="ltd.qcwifi.jobs.model.Jobs">
+		SELECT
+		f_id fId,
+		f_name fName,
+		f_schedual_time fSchedualTime,
+		f_currentStatus fCurrentStatus,
+		f_classname fClassName,
+		f_jobDesc
+		fJobDesc
+		FROM
+		backend_jobs
+		<where>
+			<if test="fId!=null and fId!=''">
+				and f_id=#{fId}
+			</if>
+			<if test="fName!=null and fName!=''">
+				and f_name like '%${fName}%'
+			</if>
+			<if test="fSchedualTime!=null and fSchedualTime!=''">
+				and f_SchedualTime=#{fSchedualTime}
+			</if>
+			<if test="fCurrentStatus!=null and fCurrentStatus!=''">
+				and f_CurrentStatus=#{fCurrentStatus}
+			</if>
+			<if test="fClassName!=null and fClassName!=''">
+				and f_ClassName like '%${fClassName}%'
+			</if>
+			<if test="fJobDesc!=null and fJobDesc!=''">
+				and f_JobDesc like '%${fJobDesc}%'
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询 （精确） -->
+	<select id="searchJob" parameterType="HashMap"
+		resultType="ltd.qcwifi.jobs.model.Jobs">
+		SELECT
+		f_id fId,
+		f_name fName,
+		f_schedual_time fSchedualTime,
+		f_currentStatus fCurrentStatus,
+		f_classname fClassName,
+		f_jobDesc
+		fJobDesc
+		FROM
+		backend_jobs
+		<where>
+			<if test="fId!=null and fId!=''">
+				and f_id=#{fId}
+			</if>
+			<if test="fName!=null and fName!=''">
+				and f_name=#{fName}
+			</if>
+			<if test="fSchedualTime!=null and fSchedualTime!=''">
+				and f_SchedualTime=#{fSchedualTime}
+			</if>
+			<if test="fCurrentStatus!=null and fCurrentStatus!=''">
+				and f_CurrentStatus=#{fCurrentStatus}
+			</if>
+			<if test="fClassName!=null and fClassName!=''">
+				and f_ClassName=#{fClassName}
+			</if>
+			<if test="fJobDesc!=null and fJobDesc!=''">
+				and f_JobDesc =#{fJobDesc}
+			</if>
+		</where>
+	</select>
+</mapper>

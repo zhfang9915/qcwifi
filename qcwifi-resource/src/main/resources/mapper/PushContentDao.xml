@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.push.content.PushContentDao">
+
+	<!-- 新增广告主 -->
+	<insert id="insert" parameterType="ltd.qcwifi.model.entity.cloud.push.content.PushContent">
+		<!-- 广告基本信息 -->
+		insert into cloud_push_content(
+			id,
+			group_id,
+			name,
+			day_limit,
+			total_limit,
+			status,
+			weight,
+			create_by,
+			create_time
+		) 
+		values(
+			#{id}, 
+			#{groupId},
+			#{name},
+			#{dayLimit},
+			#{totalLimit},
+			#{status},
+			#{weight},
+			#{createBy},
+			now()
+		);
+		<!-- 广告选择信息 -->
+		insert into cloud_push_content_choose(
+			id,
+			template_id,
+			imgs,
+			urls
+		) 
+		values(
+			#{id}, 
+			#{choose.templateId},
+			#{choose.imgs},
+			#{choose.urls}
+		);
+		<!-- 广告定向信息 -->
+<!-- 		insert into cloud_push_content_set( -->
+<!-- 			id, -->
+<!-- 			start, -->
+<!-- 			end, -->
+<!-- 			area, -->
+<!-- 			category, -->
+<!-- 			shop, -->
+<!-- 			channel, -->
+<!-- 			terminal -->
+<!-- 		)  -->
+<!-- 		values( -->
+<!-- 			#{id},  -->
+<!-- 			#{set.start}, -->
+<!-- 			#{set.end}, -->
+<!-- 			#{set.area}, -->
+<!-- 			#{set.category}, -->
+<!-- 			#{set.shop}, -->
+<!-- 			#{set.channel}, -->
+<!-- 			#{set.terminal} -->
+<!-- 		); -->
+	</insert>
+	
+	<!-- 查询用户下的推广内容 -->
+	<select id="selects" resultType="ltd.qcwifi.model.entity.cloud.push.content.PushContent">
+		SELECT
+			t.id,
+			t.name,
+			t.day_limit,
+			t.total_limit,
+			t.weight,
+			t.status
+		FROM
+			cloud_push_content t
+		WHERE
+			t.create_by = #{createBy}
+			<if test="name != null and name != ''">  
+				AND t.name like CONCAT('%',#{name},'%')
+			</if>
+	</select>
+	
+	<!-- 查询用户下的推广内容 -->
+	<select id="selectDetail" resultType="ltd.qcwifi.model.entity.cloud.push.content.PushContent">
+		SELECT
+			t.id,
+			t. NAME,
+			t.day_limit,
+			t.total_limit,
+			t.weight,
+			t. STATUS,
+			t.group_id,
+			t.create_by,
+			g.`name` 'group.name',
+			p.`name` 'choose.templateName',
+			c.imgs 'choose.imgs',
+			c.urls 'choose.urls',
+			c.template_id 'choose.templateId'
+		FROM
+			cloud_push_content t
+		LEFT JOIN cloud_push_content_group g ON t.group_id = g.id
+		LEFT JOIN cloud_push_content_choose c ON t.id = c.id
+		LEFT JOIN cloud_push_content_temp p ON c.template_id = p.id
+		WHERE
+			t.create_by = #{createBy}
+		AND t.id = #{id}
+	</select>
+	
+	<!-- 删除广告 -->
+	<delete id="delete">
+		DELETE
+		FROM
+			cloud_push_content_choose
+		WHERE
+			id = #{id}
+		AND EXISTS (
+			SELECT
+				create_by
+			FROM
+				cloud_push_content
+			WHERE
+				id = #{id}
+		);
+		DELETE
+		FROM
+			cloud_push_content
+		WHERE
+			id = #{id} and create_by=#{createBy};
+	</delete>
+	
+	<!-- 更新广告信息 -->
+	<update id="update" parameterType="ltd.qcwifi.model.entity.cloud.push.content.PushContent">
+		update cloud_push_content
+		set 
+			group_id=#{groupId},
+			name=#{name},
+			day_limit=#{dayLimit},
+			total_limit=#{totalLimit},
+			weight=#{weight}
+		where
+			id = #{id};
+		<!-- 广告选择信息 -->
+		update cloud_push_content_choose
+		set
+			template_id=#{choose.templateId},
+			imgs=#{choose.imgs},
+			urls=#{choose.urls}
+		where
+			id = #{id};
+	</update>
+	
+	<!-- 更新广告上下架信息 -->
+	<update id="updateStatus" parameterType="ltd.qcwifi.model.entity.cloud.push.content.PushContent">
+		update cloud_push_content
+		set 
+			status = #{status}
+		where
+			id = #{id} and create_by = #{createBy};
+	</update>
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.wechat.WechatDao">
+
+	<!-- 查询 -->
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.wechat.WechatAccount">
+		SELECT * FROM wechat_account WHERE app_id=#{id}
+	</select>
+	
+	<select id="selectByUserId" resultType="ltd.qcwifi.model.entity.wechat.WechatAccount">
+		SELECT * FROM wechat_account WHERE user_id=#{userId}
+	</select>
+
+	<!-- 新增 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO wechat_account(
+			app_id,
+			wechat_id,
+			original_id,
+			user_id,
+			nick_name,
+			head_img_url,
+			qrcode_url,
+			signature,
+			func_info,
+			business_info,
+			service_type_info,
+			verify_type_info,
+			shop_count,
+			access_token,
+			refresh_access_token
+		)
+		VALUES(
+			#{appId},
+			#{wechatId},
+			#{originalId},
+			#{userId},
+			#{nickName},
+			#{headImgUrl},
+			#{qrcodeUrl},
+			#{signature},
+			#{funcInfo},
+			#{businessInfo},
+			#{serviceTypeInfo},
+			#{verifyTypeInfo},
+			0,
+			#{accessToken},
+			#{refreshAccessToken}
+		)
+	</insert>
+	
+	<!-- 更新 -->
+	<update id="update" parameterType="ltd.qcwifi.model.entity.wechat.WechatAccount">
+		UPDATE
+			wechat_account
+		SET
+			wechat_id = #{wechatId},
+			nick_name = #{nickName},
+			head_img_url = #{headImgUrl},
+			qrcode_url = #{qrcodeUrl},
+			signature = #{signature},
+			func_info = #{funcInfo},
+			business_info = #{businessInfo},
+			service_type_info = #{serviceTypeInfo},
+			verify_type_info = #{verifyTypeInfo},
+			shop_count = #{shopCount},
+			access_token = #{accessToken},
+			refresh_access_token = #{refreshAccessToken}
+		WHERE
+			app_id = #{appId}
+	</update>
+	
+	<!-- 更新商铺数量 -->
+	<update id="updateWechatShopCount">
+		UPDATE wechat_account SET shop_count = #{shopCount} WHERE app_id = #{appId}
+	</update>
+	
+	<!-- 更新WiFi插件是否开通 -->
+	<update id="updateWechatIsOpenWifiPlugin">
+		UPDATE wechat_account SET is_wifi_open = #{isOpen} WHERE app_id = #{appId}
+	</update>
+	
+	<!-- 根据商铺id去查询关联的微信门店 -->
+	<select id="getWechatShopByShopId" resultType="ltd.qcwifi.model.entity.wechat.ShopWechat">
+		SELECT * FROM cloud_shop_wechat WHERE shop_id=#{shopId}
+	</select>
+	
+</mapper>

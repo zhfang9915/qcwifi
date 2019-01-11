@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+	<description>rabbitmq 连接服务配置</description>
+	
+	<rabbit:connection-factory id="connectionFactory"
+		host="${mq.host}" port="${mq.port}" username="${mq.username}" password="${mq.password}"/>
+
+	<rabbit:admin connection-factory="connectionFactory" />
+	
+	<!-- json转换器，消息可以自动根据转换器转换格式，不配置时默认为java序列化，可以自行配置 -->
+	<bean id="messageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />
+
+	
+	<!-- 		
+		2.fanout模式配置：发送到所有绑定的queue中，但每个queue只发一次
+	-->
+	<!-- 2.1队列配置 -->
+	<!-- 路由器信息上报队列 -->
+	<rabbit:queue name="qc.socket.test" />
+	<rabbit:fanout-exchange name="fanout.exchange.socket">
+	    <rabbit:bindings>
+	        <rabbit:binding queue="qc.socket.test"/>
+	    </rabbit:bindings>
+	</rabbit:fanout-exchange>
+	    
+	
+	<!-- 消费者配置 -->
+	<rabbit:annotation-driven /><!-- 启用注解 -->
+	<bean id="rabbitListenerContainerFactory"
+	    class="org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory">
+	    <property name="messageConverter" ref="messageConverter" />
+	    <property name="connectionFactory" ref="connectionFactory" />
+	    <property name="concurrentConsumers" value="3" />
+	    <property name="maxConcurrentConsumers" value="10" />
+	</bean>
+	
+	<!-- 生产者配置 -->
+	<rabbit:template id="rabbitTemplate" message-converter="messageConverter"
+	    connection-factory="connectionFactory" reply-timeout="2000" retry-template="retryTemplate"/>
+	    
+	<!-- retryTemplate为连接失败时的重发队列所用的templete -->
+	<bean id="retryTemplate" class="org.springframework.retry.support.RetryTemplate">
+	    <property name="backOffPolicy">
+	        <bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
+	            <property name="initialInterval" value="500" />
+	            <property name="multiplier" value="10.0" />
+	            <property name="maxInterval" value="10000" />
+	        </bean>
+	    </property>
+	</bean>
+</beans>

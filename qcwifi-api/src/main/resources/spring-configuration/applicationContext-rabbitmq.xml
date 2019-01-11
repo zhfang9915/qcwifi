@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+	<description>rabbitmq 连接服务配置</description>
+	
+	<rabbit:connection-factory id="connectionFactory"
+		host="${mq.host}" port="${mq.port}" username="${mq.username}" password="${mq.password}"/>
+
+	<rabbit:admin connection-factory="connectionFactory" />
+	
+	<!-- json转换器，消息可以自动根据转换器转换格式，不配置时默认为java序列化，可以自行配置 -->
+	<bean id="messageConverter" class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />
+
+	<!-- 		
+		1.direct模式配置: 队列配置需要在生产者消费者两边同时配置。 
+		如果只在生产者方配置，rabbitmq服务器中无队列时，会导致消费者服务器启动时找不到监听队列报错
+		根据routingKey将消息发送到所有绑定的queue中		
+	-->
+	<!-- 队列配置:将queue和routingKey进行绑定 -->
+	<rabbit:queue name="qcwifi.queue.sync" />
+	<rabbit:queue name="qcwifi.queue.async" />
+	<rabbit:queue name="qcwifi.queue.async.reply" /><!-- 定义回复queue -->
+	<rabbit:direct-exchange name="direct.exchange.router">
+	    <rabbit:bindings>
+	    	<!-- 队列分为同步和异步模式，异步模式支持异步回复功能。qcwifi.queue.sync队列为同步，
+	    		qcwifi.queue.async和qcwifi.queue.async.reply组合为异步 
+	    	-->
+	        <rabbit:binding queue="qcwifi.queue.sync" key="qcwifi.binding.sync" />
+	        <rabbit:binding queue="qcwifi.queue.async" key="qcwifi.binding.async" />
+	        <rabbit:binding queue="qcwifi.queue.async.reply" key="qcwifi.binding.async.reply" />
+	    </rabbit:bindings>
+	</rabbit:direct-exchange>
+	
+	
+	<!-- 		
+		2.fanout模式配置：发送到所有绑定的queue中，但每个queue只发一次
+	-->
+	<!-- 2.1队列配置 -->
+	<!-- 路由器信息上报队列 -->
+	<rabbit:queue name="router.info" />
+	<rabbit:fanout-exchange name="fanout.exchange.router">
+	    <rabbit:bindings>
+	        <rabbit:binding queue="router.info" />
+	    </rabbit:bindings>
+	</rabbit:fanout-exchange>
+	    
+	<!-- 
+		3.topic模式配置
+	 -->
+	<!-- 3.1队列设置 -->
+	<rabbit:queue name="topic.router.info" /><!-- 路由器信息上报队列 -->
+	<rabbit:queue name="topic.ads.seq" /><!-- 广告流水上传队列 -->
+	<rabbit:queue name="topic.ads.seq.upload" /><!-- 广告流水上传队列 -->
+	<rabbit:topic-exchange name="topic.exchange.qcwifi">
+	    <rabbit:bindings>
+	        <rabbit:binding queue="topic.router.info" pattern="topic.router.info"/>
+	        <rabbit:binding queue="topic.ads.seq" pattern="topic.ads.seq"/>
+	        <rabbit:binding queue="topic.ads.seq.upload" pattern="topic.ads.seq.upload"/>
+	    </rabbit:bindings>
+	</rabbit:topic-exchange>
+
+
+	<!-- 消费者配置 -->
+	<rabbit:annotation-driven /><!-- 启用注解 -->
+	<bean id="rabbitListenerContainerFactory"
+	    class="org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory">
+	    <property name="messageConverter" ref="messageConverter" />
+	    <property name="connectionFactory" ref="connectionFactory" />
+	    <property name="concurrentConsumers" value="3" />
+	    <property name="maxConcurrentConsumers" value="10" />
+	</bean>
+	
+	<!-- 生产者配置 -->
+	<rabbit:template id="rabbitTemplate" message-converter="messageConverter"
+	    connection-factory="connectionFactory" reply-timeout="2000" retry-template="retryTemplate"/>
+	    
+	<!-- retryTemplate为连接失败时的重发队列所用的templete -->
+	<bean id="retryTemplate" class="org.springframework.retry.support.RetryTemplate">
+	    <property name="backOffPolicy">
+	        <bean class="org.springframework.retry.backoff.ExponentialBackOffPolicy">
+	            <property name="initialInterval" value="500" />
+	            <property name="multiplier" value="10.0" />
+	            <property name="maxInterval" value="10000" />
+	        </bean>
+	    </property>
+	</bean>
+</beans>

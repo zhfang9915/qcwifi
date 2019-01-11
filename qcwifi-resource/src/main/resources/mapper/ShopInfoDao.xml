@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.ShopInfoDao">
+
+	<!-- 商铺创建 -->
+	<insert id="createShop" useGeneratedKeys="true" keyProperty="shopId" parameterType="ltd.qcwifi.model.entity.cloud.platform.ShopInfo">
+		INSERT INTO cloud_shop_info (
+			shop_name,
+			province,
+			city,
+			area,
+			address,
+			lat,
+			lng,
+			primary_category,
+			secondary_category,
+			phone,
+			create_time,
+			create_by
+		)
+		VALUES
+			(
+				#{shopName},
+				#{province},
+				#{city},
+				#{area},
+				#{address},
+				#{lat},
+				#{lng},
+				#{primaryCategory},
+				#{secondaryCategory},
+				#{phone},
+				now(),
+				#{createBy}
+			);
+	</insert>
+	
+	<!-- 商铺列表查询 -->
+	<select id="selectShopInfo" parameterType="ltd.qcwifi.model.dto.param.ShopInfoParam" 
+		resultType="ltd.qcwifi.model.entity.cloud.platform.ShopInfo">
+		SELECT
+			t.shop_id,
+			t.shop_name,
+			t.province,
+			t.city,
+			t.area,
+			t.address,
+			t.phone,
+			t.lng,
+			t.lat,
+			r.dev_no
+		FROM
+			cloud_shop_info t
+		LEFT JOIN cloud_shop_router r on t.shop_id=r.shop_id
+		<where>
+			t.create_by = #{createBy}
+			<if test="category != null and category != ''">
+				and t.primary_category = #{category}
+			</if>
+			<if test="name != null and name != ''">
+				and t.shop_name like CONCAT('%',#{name},'%')
+			</if>
+			<if test="shopId != null and shopId != ''">
+				and t.shop_id = #{shopId}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 根据ID查询商铺 -->
+	<select id="selectShopInfoById" resultType="ltd.qcwifi.model.entity.cloud.platform.ShopInfo">
+		SELECT
+			*
+		FROM
+			cloud_shop_info t
+		where
+			t.create_by = #{createBy} and t.shop_id = #{shopId}
+	</select>
+	
+	<!-- 更新商铺 -->
+	<update id="updateRemark" parameterType="ltd.qcwifi.model.entity.cloud.platform.ShopInfo">
+		update cloud_shop_info
+		set
+			remark = #{remark}
+		where create_by = #{createBy} and shop_id = #{shopId}
+	</update>
+	
+	<update id="updateShop" parameterType="ltd.qcwifi.model.entity.cloud.platform.ShopInfo">
+		update cloud_shop_info
+		set
+			shop_name = #{shopName},
+			province = #{province},
+			city = #{city},
+			area = #{area},
+			address = #{address},
+			lat = #{lat},
+			lng = #{lng},
+			primary_category = #{primaryCategory},
+			secondary_category = #{secondaryCategory},
+			phone = #{phone}
+		where create_by = #{createBy} and shop_id = #{shopId}
+	</update>
+	
+	<!-- 删除商铺信息 -->
+	<delete id="deleteShop">
+		delete from cloud_shop_info where shop_id=#{shopId};
+		delete from cloud_shop_mark_relation where shop_id=#{shopId};
+		delete from cloud_shop_sub_account where user_id in (select id from cloud_shop_sub where shop_id=#{shopId});
+		delete from cloud_shop_sub where shop_id=#{shopId};
+		delete from cloud_shop_router where shop_id=#{shopId};
+	</delete>
+	
+	
+	<insert id="createSubAccount" useGeneratedKeys="true" keyProperty="id" parameterType="ltd.qcwifi.model.entity.cloud.platform.SubAccount">
+		INSERT INTO cloud_shop_sub_account (
+			user_id,
+			nickname,
+			username,
+			name,
+			phone,
+			locked,
+			create_time,
+			create_by
+		)
+		VALUES
+			(
+				#{userId},
+				#{nickname},
+				#{username},
+				#{name},
+				#{phone},
+				#{locked},
+				now(),
+				#{createBy}
+			);
+	</insert>
+	
+	<!-- 查询当前账号下的连锁账号 -->
+	<select id="selectSubAccount" resultType="ltd.qcwifi.model.entity.cloud.platform.SubAccount">
+		SELECT
+			t.id,
+			t.user_id,
+			t.nickname,
+			t.username,
+			t.name,
+			t.phone,
+			t.locked
+		FROM
+			cloud_shop_sub_account t
+		WHERE
+			t.create_by = #{createBy}
+	</select>
+	
+	<!-- 通过当前登陆账号修改连锁账户 -->
+	<update id="updateSubAccount">
+		update 
+			cloud_shop_sub_account 
+		set 
+			${filed} = #{val} 
+		where 
+			id = #{id} 
+		and create_by=#{parent};
+		<if test="filed=='locked' or filed=='nickname'">
+			update 
+				backend_users 
+			set 
+				${filed} = #{val} 
+			where 
+				id = #{userId} and exists (select id from cloud_shop_sub_account where id=#{id} and create_by=#{parent});
+		</if>
+	</update>
+	
+	<select id="selectSubAccountById" resultType="ltd.qcwifi.model.entity.cloud.platform.SubAccount">
+		select 
+			t.id,
+			t.user_id,
+			t.nickname,
+			t.username,
+			t.name,
+			t.phone,
+			t.locked 
+		from 
+			cloud_shop_sub_account t
+		where 
+			t.id=#{id} 
+		and t.create_by=#{createBy};
+	</select>
+	
+	<delete id="deleteSubAccount">
+		delete from backend_users
+		where id=#{userId} and exists (select id from cloud_shop_sub_account where id=#{id} and create_by=#{createBy});
+		delete from cloud_shop_sub_account
+		where id=#{id} and create_by=#{createBy};
+	</delete>
+	
+	<!-- 连锁账号可选商铺 -->
+	<select id="selectFreeShop" resultType="ltd.qcwifi.model.entity.cloud.platform.ShopInfo">
+		SELECT
+			t.shop_id,
+			t.shop_name
+		FROM
+			cloud_shop_info t
+		LEFT JOIN cloud_shop_sub s ON t.shop_id = s.shop_id
+		AND s.sub_id = #{id}
+		WHERE
+			t.create_by = #{createBy}
+		AND s.shop_id IS NULL
+	</select>
+	
+	<!-- 连锁账号可选商铺 -->
+	<select id="selectCheckedShop" resultType="ltd.qcwifi.model.entity.cloud.platform.ShopInfo">
+		SELECT
+			t.shop_id,
+			t.shop_name
+		FROM
+			cloud_shop_info t
+		RIGHT JOIN cloud_shop_sub s ON t.shop_id = s.shop_id
+		AND s.sub_id = #{id}
+		WHERE
+			t.create_by = #{createBy}
+		AND t.shop_id IS NOT NULL
+	</select>
+	
+	<!-- 添加连锁商铺 -->
+	<insert id="insertShopSub">
+		insert into cloud_shop_sub(
+			sub_id, shop_id, create_by, create_time
+		) 
+		values
+		<foreach collection="shops" item="shop" index="index" separator=",">
+			(#{subId}, #{shop}, #{createBy}, now())
+        </foreach>
+	</insert>
+	
+	<!-- 删除连锁商铺 -->
+	<delete id="deleteShopSub">
+		delete from cloud_shop_sub
+		where sub_id=#{subId} and create_by=#{createBy} and shop_id in
+		<foreach collection="shops" item="s" index="index" separator="," open="(" close=")">
+			#{s.shopId}
+        </foreach>
+	</delete>
+	
+	<!-- 添加商铺时验证所添加地商铺是否是当前账号地商铺 -->
+	<select id="confimShopSub" resultType="java.lang.Long">
+		select shop_id from cloud_shop_info 
+		where create_by=#{createBy} and shop_id in
+		<foreach collection="shops" item="s" index="index" separator="," open="(" close=")">
+			#{s.shopId}
+        </foreach>
+	</select>
+</mapper>

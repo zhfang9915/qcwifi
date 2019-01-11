@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.OrderDao">
+	
+	
+	<!-- 保存短信订购订单 -->
+	<insert id="saveSmsOrder" parameterType="ltd.qcwifi.model.entity.cloud.platform.OrderMain">
+		INSERT INTO cloud_account_order (
+			order_no,
+			order_title,
+			amount,
+			status,
+			create_time,
+			create_by
+		)
+		VALUES
+			(
+				#{orderNo},
+				#{orderTitle},
+				#{amount},
+				#{status},
+				now(),
+				#{createBy});
+		INSERT INTO cloud_account_order_detail (
+			order_no,
+			offer_id,
+			qty
+		)
+		VALUES
+			<foreach collection="details" item="item" index="index" separator="," >  
+		        (
+					#{item.orderNo},
+					#{item.offerId},
+					#{item.qty}
+				)
+		    </foreach>
+		   ;
+			
+	</insert>
+	
+	<!-- 订单查询 -->
+	<select id="selectOrderByNo" resultType="ltd.qcwifi.model.entity.cloud.platform.OrderMain">
+		SELECT
+			o.*, d.id 'details.id',
+			d.order_no 'details.orderNo',
+			d.qty 'details.qty',
+			f.offer_id 'details.offer.offerId',
+			f.offer_name 'details.offer.offerName',
+			f.offer_type 'details.offer.offerType',
+			f.price 'details.offer.price',
+			f.sms_count 'details.offer.smsCount'
+		FROM
+			cloud_account_order o
+		LEFT JOIN cloud_account_order_detail d ON o.order_no = d.order_no
+		LEFT JOIN backend_offer f ON d.offer_id = f.offer_id
+		WHERE
+			o.create_by = #{createBy}
+		AND o.order_no = #{orderNo}
+	</select>
+	
+</mapper>

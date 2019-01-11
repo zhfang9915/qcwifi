@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.SmsConsumeDao">
+	
+	
+	<!-- 短信使用记录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into cloud_shop_sms_log(user_id, context, send_time) 
+		values(#{userId},#{context},now());
+	</insert>
+	
+	
+	
+</mapper>

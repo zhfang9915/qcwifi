@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.BalanceDao">
+
+	<!-- ######################		基础操作		######################### -->
+	<!-- 新增插件 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into accset_balance(
+			user_id,
+			total_balance,
+			create_time
+		) 
+		values(
+			#{userId}, 
+			#{totalBalance},
+			now()
+		)
+	</insert>
+	
+	<!-- 删除插件 -->
+	<delete id="deleteById">
+		delete from accset_balance where id=#{id}
+	</delete>
+	
+	<!-- 删除插件 -->
+	<delete id="deleteByUserId">
+		delete from accset_balance where user_id=#{userId}
+	</delete>
+	
+	<!-- 根据id获取余额-->
+	<select id="selectById" resultType="ltd.qcwifi.model.entity.cloud.Balance">
+		select * from accset_balance where id=#{id}
+	</select>
+	
+	<!-- 根据user_id获取余额-->
+	<select id="selectByUserId" resultType="ltd.qcwifi.model.entity.cloud.Balance">
+		select * from accset_balance where user_id=#{userId}
+	</select>
+
+	<!-- 根据id更新余额字段 -->
+	<update id="updateById">
+		update 
+			accset_balance
+		set
+			total_balance=#{totalBalance}
+		where
+			id=#{id}
+	</update>
+	
+	<!-- 根据user_id更新余额字段 -->
+	<update id="updateByUserId">
+		update 
+			accset_balance
+		set
+			total_balance=#{totalBalance}
+		where
+			user_id=#{userId}
+	</update>
+	
+</mapper>

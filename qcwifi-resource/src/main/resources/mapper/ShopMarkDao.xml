@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.ShopMarkDao">
+
+	<!-- 商铺标签创建 -->
+	<insert id="createShopMark" useGeneratedKeys="true" keyProperty="id" parameterType="ltd.qcwifi.model.entity.cloud.platform.ShopMark">
+		INSERT INTO cloud_shop_mark (
+			name,
+			create_by
+		)
+		VALUES
+			(
+				#{name},
+				#{createBy}
+			);
+	</insert>
+	
+	<!-- 商铺标签关系关联 -->
+	<insert id="createShopMarkRelation">
+		INSERT INTO cloud_shop_mark_relation (
+			shop_id, mark_id
+		)
+		VALUES
+		<foreach collection="list" item="mark" index="index" separator=",">
+				(#{shopId}, #{mark})
+        </foreach>
+	</insert>
+	
+	<!-- 商铺标签查询 -->
+	<select id="selectAll" resultType="ltd.qcwifi.model.entity.cloud.platform.ShopMark">
+		SELECT
+			t.id,
+			t.name
+		FROM
+			cloud_shop_mark t
+		<where>
+			<if test="createBy != null and createBy != ''">
+				and t.create_by = #{createBy}
+			</if>
+		</where>
+	</select>
+	
+	
+</mapper>

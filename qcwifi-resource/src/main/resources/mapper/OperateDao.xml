@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.OperateDao">
+
+	<!-- 商铺列表查询 -->
+	<select id="selectOperateByLevel" resultType="ltd.qcwifi.model.entity.cloud.platform.Operate">
+		SELECT
+			t.id,
+			t.NAME
+		FROM
+			cloud_operate_class t
+		WHERE
+			t.level = #{level}
+		AND t.parent = #{parent}
+	</select>
+	
+	
+</mapper>

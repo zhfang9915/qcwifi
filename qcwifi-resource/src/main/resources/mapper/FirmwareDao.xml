@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.platform.FirmwareDao">
+
+	<!-- ######################		基础操作		######################### -->
+	<!-- 新增插件 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into backend_firmware(
+			id,
+			description, 
+			version, 
+			crosstool,
+			md5,
+			downloadUrl,
+			resPath,
+			available,
+			createBy,
+			name,
+			create_time,
+			bakUrl,
+			bakPath,
+			bakMd5
+		) 
+		values(
+			#{id},
+			#{description},
+			#{version}, 
+			#{crosstool},
+			#{md5},
+			#{downloadUrl},
+			#{resPath},
+			#{available},
+			#{createBy},
+			#{name},
+			now(),
+			#{bakUrl},
+			#{bakPath},
+			#{bakMd5}
+		)
+	</insert>
+	
+	<!-- 删除插件 -->
+	<delete id="delete">
+		delete from backend_firmware where id=#{id}
+	</delete>
+	
+	<!-- 批量删除插件 -->
+	<delete id="batchDelete">
+		delete from backend_firmware where id in
+		<foreach collection="list" item="p" index="index" open="(" close=")" separator=",">
+            #{p.id}
+        </foreach>
+	</delete>
+	
+	<!-- 根据ID获取固件 -->
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.cloud.platform.Firmware">
+		select * from backend_firmware where id=#{id}
+	</select>
+	
+	<!-- 根据md5获取固件 -->
+	<select id="selectOneByMD5" resultType="ltd.qcwifi.model.entity.cloud.platform.Firmware">
+		select * from backend_firmware where md5=#{md5}
+	</select>
+	
+	<!-- 根据备份文件md5获取固件 -->
+	<select id="selectOneByBakMD5" resultType="ltd.qcwifi.model.entity.cloud.platform.Firmware">
+		select * from backend_firmware where bakMd5=#{md5}
+	</select>
+	
+	<!-- 获取所有GCC版本 -->
+	<select id="searchCrosstool" resultType="java.lang.String">
+		select distinct crosstool from backend_firmware
+	</select>
+	
+	<!-- 根据version获取固件 -->
+	<select id="selectByVersion" resultType="ltd.qcwifi.model.entity.cloud.platform.Firmware">
+		select * from backend_firmware where version=#{version}
+	</select>
+	
+	<!-- 根据version获取GCC版本 -->
+	<select id="searchCrosstoolByVersion" resultType="java.lang.String">
+		select crosstool from backend_firmware where version=#{version}
+	</select>
+	
+	<!-- 查询固件列表的条件sql -->
+	<sql id="queryFirmwareCondition">
+		<where>
+			1=1
+			<if test="version != null and version != ''">  
+		       and version like CONCAT('%',#{version},'%')
+		    </if>
+			<if test="crosstool != null and crosstool != ''">  
+		       and crosstool like CONCAT('%',#{crosstool},'%')
+		    </if>
+		   	<if test="description != null and description != ''">
+		       and description like CONCAT('%',#{description},'%')
+		    </if>
+			<if test="available != null and available != ''">  
+		       and available = #{available, jdbcType=TINYINT}
+		    </if>
+		</where>
+	</sql>
+	
+	<!-- 分页查询插件列表 -->
+	<select id="selectByPage" parameterType="ltd.qcwifi.model.dto.param.FirmwareParam" resultType="ltd.qcwifi.model.entity.cloud.platform.Firmware">
+		select * from backend_firmware
+		<include refid="queryFirmwareCondition"/>
+		order by create_time desc
+	</select>
+	
+	<update id="update" parameterType="ltd.qcwifi.model.entity.cloud.platform.Firmware">
+		update 
+			backend_firmware
+		set
+			version=#{version},
+			crosstool=#{crosstool},
+			description=#{description},
+			available=#{available}
+		where
+			id=#{id}
+	</update>
+</mapper>

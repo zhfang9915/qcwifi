@@ -1,0 +1,46 @@
+#drag{
+    position: relative;
+    background-color: #e8e8e8;
+    border:1px solid #ccc;
+    width: 290px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    margin-bottom:15px;
+}
+#drag .handler{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 40px;
+    height: 35px;
+    cursor: move;
+}
+.handler_bg{
+    background: #fff url("../images/slider.png") no-repeat center;
+	background-size: 65%;
+	background-position: center 48%;
+}
+.handler_ok_bg{
+    background: #fff url("../images/success.png") no-repeat center;
+	background-size: 65%;
+	background-position: center 48%;
+}
+#drag .drag_bg{
+    background-color: #7ac23c;
+    height: 35px;
+    width: 0px;
+}
+#drag .drag_text{
+    position: absolute;
+    top: 0px;
+    width: 292px;
+    color:#9c9c9c;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -o-user-select:none;
+    -ms-user-select:none;
+
+    font-size: 12px;        //  add
+}

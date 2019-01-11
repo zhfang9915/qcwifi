@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.system.UserDao">
+
+<!-- 	<cache eviction="LRU" type="ltd.qcwifi.resource.mybatis.redis.ecache.RedisCache" flushInterval="300000"/> -->
+	
+	<!-- 根据id获取User -->
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.User">
+		select * from backend_users where id=#{id}
+	</select>
+	
+	<!-- 获取所有的User信息 -->
+	<select id="selectAll" resultType="ltd.qcwifi.model.entity.User">
+		select * from backend_users
+	</select>
+	
+	<!-- 新增用户 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into backend_users(username, password, nickname, salt, type, locked, create_time) 
+		values(#{username}, #{password}, #{nickname}, #{salt}, #{type}, #{locked}, now());
+	</insert>
+	
+	
+	<!-- 根据用户名查询账户信息 -->
+	<select id="findUserByName" resultType="ltd.qcwifi.model.entity.User">
+		select * from backend_users where username=#{username}
+	</select>
+	
+	<!-- 更新最后登录时间 -->
+	<update id="updateLastLoginTime" parameterType="ltd.qcwifi.model.entity.User">
+		update backend_users set last_login_time=#{lastLoginTime}
+		where id=#{id}
+	</update>
+	
+	<!-- 更新会员账号信息 -->
+	<update id="updateUserNickAndLock" parameterType="ltd.qcwifi.model.entity.User">
+		update backend_users set nickname=#{nickname},locked=#{locked}
+		where id=#{id}
+	</update>
+	
+	<!-- 根据用户名修改用户密码 -->
+	<update id="updatePasswordByUsername">
+		update backend_users set password=#{password}
+		where username=#{username}
+	</update>
+	
+	<!-- 根据角色ID查询用户ID -->
+	<select id="selectUserIdByRoleId" resultType="java.lang.Long" parameterType="java.lang.Long">
+		SELECT
+			ur.user_id
+		FROM
+			backend_users_roles ur
+		WHERE
+			ur.role_id = #{roleId}
+	</select>
+	
+	<select id="selectUserIdByPermission" resultType="java.lang.Long">
+		SELECT
+			r.role
+		FROM
+			backend_roles r,
+			backend_users_roles ur,
+			backend_roles_permissions rp
+		WHERE
+			r.id = ur.role_id
+		AND ur.role_id = rp.role_id
+		AND rp.permission_id in
+		<foreach collection="list" item="p" index="index" open="(" close=")" separator=",">
+            #{p.id}
+        </foreach>
+	</select>
+	
+	<!-- 查询权限列表的条件sql -->
+	<sql id="queryUsersCondition">
+		<where>
+			1=1
+			<if test="username != null and username != ''">  
+		       and username like CONCAT('%',#{username},'%')
+		    </if>  
+			<if test="nickname != null and nickname != ''">  
+		       and nickname like CONCAT('%',#{nickname},'%')
+		    </if>  
+			<if test="locked != null and locked != ''">  
+		       and locked = #{locked, jdbcType=TINYINT}
+		    </if>  
+		</where>
+	</sql>
+	
+	<!-- 分页查询权限列表 -->
+	<select id="selectByPage" parameterType="ltd.qcwifi.model.dto.param.UserParam" resultType="ltd.qcwifi.model.entity.User">
+		select * from backend_users
+		<include refid="queryUsersCondition"/>
+		order by id desc
+	</select>
+	
+	<!-- 删除角色 -->
+	<delete id="delete">
+		delete from backend_users where id=#{id}
+	</delete>
+	<!-- 删除用户角色 -->
+	<delete id="deleteUserRole">
+		delete from backend_users_roles where user_id=#{userId}
+	</delete>
+	
+	<!-- 批量删除角色关联的用户 -->
+	<delete id="batchDeleteUserRole">
+		delete from backend_users_roles where user_id in
+		<foreach collection="list" item="u" index="index" open="(" close=")" separator=",">
+            #{u.id}
+        </foreach>
+	</delete>
+	<!-- 批量删除角色 -->
+	<delete id="batchDelete">
+		delete from backend_users where id in
+		<foreach collection="list" item="u" index="index" open="(" close=")" separator=",">
+            #{u.id}
+        </foreach>
+	</delete>
+	
+	
+</mapper>

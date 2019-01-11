@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.platform.JscodeDao">
+
+	<!-- 新增数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into backend_jscode(
+			code_id, 
+			code_name, 
+			is_default, 
+			server_ip, 
+			server_port, 
+			code,
+			remark,
+			create_time
+		) 
+		values(
+			#{codeId},
+			#{codeName},
+			#{isDefault}, 
+			#{serverIp}, 
+			#{serverPort},
+			#{code},
+			#{remark},
+			now()
+		)
+	</insert>
+	
+	<!-- 分页查询列表 -->
+	<select id="selectByPage" parameterType="ltd.qcwifi.model.dto.param.JscodeParam" resultType="ltd.qcwifi.model.entity.cloud.platform.Jscode">
+		select * from backend_jscode
+		<include refid="queryJscodeCondition"/>
+		order by create_time desc
+	</select>
+	
+	<!-- 查询JS总数量 -->
+	<select id="queryAllJscodeCount" resultType="java.lang.Integer">
+		select count(0) from backend_jscode
+	</select>
+	
+	<!-- 查询默认的JS -->
+	<select id="queryDefaultJscode" resultType="ltd.qcwifi.model.entity.cloud.platform.Jscode">
+		select * from backend_jscode where is_default=1
+	</select>
+	
+	<!-- 把默认的JS设置为非默认 -->
+	<update id="updateDefaultToUndefault">
+		update
+			backend_jscode
+		set 
+			is_default=0
+		where 
+			is_default=1
+	</update>
+	
+	<!-- 查询列表的条件sql -->
+	<sql id="queryJscodeCondition">
+		<where>
+			1=1
+			<if test="codeId != null and codeId != ''">  
+		       and code_id like CONCAT('%',#{codeId},'%')
+		    </if>
+			<if test="codeName != null and codeName != ''">  
+		       and code_name like CONCAT('%',#{codeName},'%')
+		    </if>
+		</where>
+	</sql>
+	
+	<!-- 删除 -->
+	<delete id="delete">
+		delete from backend_jscode where id=#{id}
+	</delete>
+	
+	<!-- 批量删除 -->
+	<delete id="batchDelete">
+		delete from backend_jscode where id in
+		<foreach collection="list" item="p" index="index" open="(" close=")" separator=",">
+            #{p.id}
+        </foreach>
+	</delete>
+	
+	<!-- 根据ID查询JS -->
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.cloud.platform.Jscode">
+		select * from backend_jscode where id=#{id}
+	</select>
+	
+	<!-- 更新 -->
+	<update id="update" parameterType="ltd.qcwifi.model.entity.cloud.platform.Jscode">
+		update 
+			backend_jscode
+		set
+			code_name=#{codeName},
+			is_default=#{isDefault},
+			server_ip=#{serverIp},
+			server_port=#{serverPort},
+			remark=#{remark},
+			code=#{code}
+		where
+			id=#{id}
+	</update>
+	
+</mapper>

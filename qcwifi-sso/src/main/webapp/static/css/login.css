@@ -1,0 +1,146 @@
+* {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+.logo-img {
+    width: 100%;
+    height: 70px;
+    vertical-align: middle;
+    display: block;
+}
+.logo-img img {
+    height: 40px;
+    margin-top: 15px;
+    width: 144px;
+}
+.logo-img::after {
+    clear: both;
+    content: '';
+    display: table;
+    visibility: hidden;
+}
+.cont-login {
+    width: 100%;
+    background: transparent;
+    height: auto;
+    overflow: hidden;
+    position: relative;
+    z-index: 9;
+}
+.cont-login .login-window {
+    float: right;
+    width: 352px;
+    height: auto;
+    overflow: hidden;
+    display: table-cell;
+    vertical-align: middle;
+    background: #fff;
+    padding: 0 30px;
+    margin-top: 7%;
+}
+.cont-login .login-window h3 {
+    margin: 20px auto;
+    text-align: center;
+}
+.cont-login .login-window input[type='text'],
+.cont-login .login-window input[type='password'] {
+    height: 35px;
+    line-height: 35px;
+}
+.cont-login .login-window h3 img {
+    width: 35px;
+    margin-right: 15px;
+}
+.cont-login .login-window button {
+    width: 100%;
+    background: #428fb9;
+    border: none;
+    color: #fff;
+    margin-bottom: 20px;
+}
+.cont-login .login-window .code input {
+    width: 50%;
+    float: left;
+}
+.cont-login .login-window .code img {
+    width: 27%;
+    margin-right: 10%;
+    height: 34px;
+}
+.cont-login .login-window .code {
+    margin-bottom: 15px;
+}
+.cont-login .login-window .password {
+    margin-bottom: 5px;
+}
+.cont-login .login-window .password button.msgs {
+    display: inline-block;
+    margin-left: 38px;
+    height: 34px;
+    line-height: 34px;
+    background: #428fb9;
+    width: 79px;
+    text-align: center;
+    cursor: pointer;
+    color: #fff;
+    border:none;
+}
+.cont-login .login-window .password button.msgs1 {
+    background: #E6E6E6;
+    color: #818080;
+    cursor: not-allowed;
+}
+.cont-login .login-window .password input {
+    width: 50%;
+    float: left;
+}
+.cont-login .login-window .code::after {
+    content: '';
+    display: table;
+    clear: both;
+    clear: both;
+}
+.cont-login .login-window button:hover {
+    background: #337ab7;
+}
+.cont-login .login-window p.forgetpassword {
+    margin-top: 10px;
+    vertical-align: middle;
+}
+.cont-login .login-window p.forgetpassword span {
+    margin: 0 5px;
+}
+.scroll-banner {
+    position: absolute;
+    top: 70px;
+    z-index: 0;
+}
+.box {
+    overflow: hidden;
+}
+.footer {
+    width: 100%;
+    z-index: 99;
+    color: #666;
+    background: #fff;
+    height: 70px;
+    position: fixed;
+    bottom: 0px;
+}
+.form-group input,
+.form-group input:focus {
+    box-shadow: none
+}
+@media screen and (min-width: 768px) {
+    .carousel-indicators {
+        bottom: 70px;
+    }
+}
+
+.login-window p.login-panel{
+font-size: 22px;
+    text-align: center;
+    margin: 20px auto 15px;
+}

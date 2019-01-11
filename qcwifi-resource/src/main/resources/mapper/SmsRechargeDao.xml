@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.SmsRechargeDao">
+	
+	
+	<!-- 短信重置记录 -->
+<!-- 	<insert id="insert" useGeneratedKeys="true" keyProperty="id"> -->
+<!-- 		insert into cloud_shop_sms_recharge(user_id, sms_id, by_time)  -->
+<!-- 		values(#{userId},#{smsId},now()); -->
+<!-- 	</insert> -->
+	
+	<select id="rechargeHistory" resultType="ltd.qcwifi.model.entity.cloud.platform.SmsRechargeHistory">
+		SELECT
+			o.create_time,
+			o.amount,
+			f.sms_count * d.qty AS count
+		FROM
+			cloud_account_order o,
+			cloud_account_order_detail d,
+			backend_offer f
+		WHERE
+			o.order_no = d.order_no
+		AND d.offer_id = f.offer_id
+		AND f.offer_type = 10001
+		AND o.create_by = #{createBy} 
+		<if test="startDate != null and startDate != ''">
+			<![CDATA[
+				AND DATE_FORMAT(o.create_time, '%Y-%m-%d') >= #{startDate}
+				AND DATE_FORMAT(o.create_time, '%Y-%m-%d') <= #{endDate}
+			]]>
+		</if>
+		<if test="startDate == null or startDate == ''">
+			<![CDATA[
+				AND DATE_FORMAT(o.create_time, '%Y-%m-%d') <= DATE_FORMAT(now(), '%Y-%m-%d')
+				AND DATE_FORMAT(o.create_time, '%Y-%m-%d') >= DATE_FORMAT(
+					DATE_SUB(now(), INTERVAL 30 DAY),
+					'%Y-%m-%d'
+				)
+			]]>
+		</if>
+		ORDER BY
+			o.create_time DESC
+	</select>
+	
+	
+</mapper>

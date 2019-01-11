@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.SmsSettingDao">
+	
+	
+	<!-- 创建短信设置 -->
+	<insert id="insert">
+		insert into cloud_shop_sms(user_id) values(#{userId});
+	</insert>
+	
+	<!-- 查询指定用户的短信设置 -->
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.cloud.platform.SmsSetting">
+		select 
+			user_id, count, alarm_min, alarm_switch 
+		from 
+			cloud_shop_sms 
+		where 
+			user_id=#{id};
+	</select>
+	
+	<!-- 短信充值/消费 -->
+	<update id="rechargeOrconsume">
+		update
+			cloud_shop_sms
+		set
+			count = #{count}
+		where 
+			user_id = #{userId};
+	</update>
+	
+	<!-- 打开短信提醒 -->
+	<update id="openAlarm">
+		update
+			cloud_shop_sms
+		set 
+			alarm_switch = true,
+			alarm_min = #{min}
+		where user_id = #{userId}
+	</update>
+	
+	<!-- 取消短信提醒 -->
+	<update id="cancleAlarm">
+		update
+			cloud_shop_sms
+		set 
+			alarm_switch = false,
+			alarm_min = #{min}
+		where user_id = #{userId}
+	</update>
+	
+</mapper>

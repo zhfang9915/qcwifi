@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<context:annotation-config />
+	
+	<bean
+		class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+		<property name="maxInactiveIntervalInSeconds" value="900" />
+		<property name="redisNamespace" value="QCWIFI"/>
+	</bean>
+	
+	<!-- redis 数据源连接池 -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<!-- 连接耗尽时是否阻塞, false报异常,ture阻塞直到超时, 默认true -->
+		<property name="blockWhenExhausted" value="${redis.jedisPoolConfig.blockWhenExhausted}"/>
+		<!-- 是否启用pool的jmx管理功能, 默认true -->
+		<property name="jmxEnabled" value="${redis.jedisPoolConfig.jmxEnabled}"/>
+		<!-- jedis调用returnObject方法时，是否进行有效检查 -->
+		<property name="testOnReturn" value="${redis.jedisPoolConfig.testOnReturn}"/>
+		<!-- 是否启用后进先出, 默认true -->
+		<property name="lifo" value="${redis.jedisPoolConfig.lifo}"/>
+		<!-- 最大空闲连接数, 默认8个 -->
+		<property name="maxIdle" value="${redis.jedisPoolConfig.maxIdle}"/>
+		<!-- 最大连接数, 默认8个 -->
+		<property name="maxTotal" value="${redis.jedisPoolConfig.maxTotal}"/>
+		<!-- 获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间,  默认-1 -->
+		<property name="maxWaitMillis" value="${redis.jedisPoolConfig.maxWaitMillis}"/>
+		<!-- 逐出连接的最小空闲时间 默认1800000毫秒(30分钟) -->
+		<property name="minEvictableIdleTimeMillis" value="${redis.jedisPoolConfig.minEvictableIdleTimeMillis}"/>
+		<!-- 最小空闲连接数, 默认0 -->
+		<property name="minIdle" value="${redis.jedisPoolConfig.minIdle}"/>
+		<!-- 每次逐出检查时 逐出的最大数目 如果为负数就是 : 1/abs(n), 默认3 -->
+		<property name="numTestsPerEvictionRun" value="${redis.jedisPoolConfig.mumTestsPerEvictionRun}"/>
+		<!-- 对象空闲多久后逐出, 当空闲时间>该值 且 空闲连接>最大空闲数 时直接逐出,不再根据MinEvictableIdleTimeMillis判断  (默认逐出策略) -->
+		<property name="softMinEvictableIdleTimeMillis" value="${redis.jedisPoolConfig.softMinEvictableIdleTimeMillis}"/>
+		<!-- 在获取连接的时候检查有效性, 默认false -->
+		<property name="testOnBorrow" value="${redis.jedisPoolConfig.testOnBorrow}"/>
+		<!-- 在空闲时检查有效性, 默认false -->
+		<property name="testWhileIdle" value="${redis.jedisPoolConfig.testWhileIdle}"/>
+		<!-- 逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${redis.jedisPoolConfig.timeBetweenEvictionRunsMillis}"/>
+	</bean>
+	
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+	    <constructor-arg index="1" value="${redis.host}" name="host" type="java.lang.String"/>
+	    <constructor-arg index="2" value="${redis.port}"  name="port" type="int"/>
+	    <constructor-arg index="3" value="5000"  name="timeout" type="int"/>
+        <constructor-arg index="4" value="${redis.password}" name="password" type="java.lang.String"/>
+	</bean>
+	
+	<!-- spring-jedis 连接池管理工程 -->
+	<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="hostName" value="${redis.host}"/>
+		<property name="port" value="${redis.port}"/>
+		<property name="password" value="${redis.password}"/>
+		<property name="poolConfig" ref="jedisPoolConfig"/>
+	</bean>
+	
+	<!-- 注入CustomerCookieSerializer到CookieHttpSessionStrategy中 -->
+	<bean id="cookieSerializer" class="org.springframework.session.web.http.DefaultCookieSerializer">
+		<property name="domainName" value="${redis.cookie.domain}"/>
+		<property name="cookieName" value="${redis.cookie.cookieName}"></property>
+	</bean>
+	
+	<!-- 配置 redis 作为 mybatis 的缓存数据库 -->
+	<bean id="redisCacheTrans" class="ltd.qcwifi.resource.mybatis.redis.ecache.RedisCacheTrans">
+		<property name="jedisConnectionFactory" ref="jedisConnectionFactory"/>
+	</bean>
+	
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
+		p:connection-factory-ref="jedisConnectionFactory" />
+		
+</beans>

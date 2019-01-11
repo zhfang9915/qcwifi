@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>ltd.qcwifi</groupId>
+		<artifactId>qcwifi-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../qcwifi-parent</relativePath>
+	</parent>
+
+	<artifactId>qcwifi-soc</artifactId>
+	<packaging>war</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<version.spring>4.3.6.RELEASE</version.spring>
+	</properties>
+
+	<dependencies>
+		<!-- 注意,scope必须为provided,否则runtime会冲突，如果使用tomcat 8,还需要将TOMCAT_HOME/lib下的javax.websocket-api.jar一并删除 -->
+		<dependency>
+		<groupId>javax.websocket</groupId>
+		<artifactId>javax.websocket-api</artifactId>
+		<version>1.1</version>
+		<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>${version.spring}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>${version.spring}</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.amqp/spring-rabbit -->
+		<dependency>
+			<groupId>org.springframework.amqp</groupId>
+			<artifactId>spring-rabbit</artifactId>
+			<version>1.6.11.RELEASE</version>
+		</dependency>
+	</dependencies>
+</project>

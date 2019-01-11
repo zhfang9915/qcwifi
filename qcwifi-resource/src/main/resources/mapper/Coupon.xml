@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.CouponDao">
+
+	<select id="queryAllCoupons" resultType="ltd.qcwifi.model.entity.Coupon">
+		select * from cloud_coupon
+	</select>
+	
+	<update id="updateCoupon">
+		update
+			cloud_coupon
+		set 
+			status=0
+		where 
+			id=#{id}
+	</update>
+
+</mapper>

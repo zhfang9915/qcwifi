@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+		<groupId>ltd.qcwifi</groupId>
+		<artifactId>qcwifi-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../qcwifi-parent</relativePath>
+	</parent>
+
+	<artifactId>qcwifi-backend</artifactId>
+	<packaging>war</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>qcwifi-shiro</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>qcwifi-resource</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.aliyun.oss</groupId> -->
+<!-- 			<artifactId>aliyun-sdk-oss</artifactId> -->
+<!-- 			<version>2.7.0</version> -->
+<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		<dependency>  
+		    <groupId>org.quartz-scheduler</groupId>  
+		    <artifactId>quartz-jobs</artifactId>  
+		    <version>2.2.1</version>  
+		</dependency> 
+	</dependencies>
+	
+  <build>
+    <finalName>qcwifi-backend</finalName>
+  </build>
+</project>

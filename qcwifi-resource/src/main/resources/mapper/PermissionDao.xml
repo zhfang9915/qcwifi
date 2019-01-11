@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.system.PermissionDao">
+	
+<!-- 	<cache eviction="LRU" type="ltd.qcwifi.resource.mybatis.redis.ecache.RedisCache" flushInterval="300000"/> -->
+	
+	<!-- 创建角色 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into backend_permissions (
+			permission,
+			description,
+			available
+		)
+		values
+			(#{permission},#{description},#{available})
+	</insert>
+	
+	
+	
+	
+	<!-- 删除权限 -->
+	<delete id="delete">
+		delete from backend_permissions where id=#{id}
+	</delete>
+	<delete id="batchDelete">
+		delete from backend_permissions where id in
+		<foreach collection="list" item="p" index="index" open="(" close=")" separator=",">
+            #{p.id}
+        </foreach>
+	</delete>
+	
+	
+	
+	
+	
+	<!-- 根据用户ID查询permission -->
+	<select id="findPermissionByUserId" resultType="java.lang.String">
+		SELECT
+			p.permission
+		FROM
+			backend_permissions p,
+			backend_roles_permissions rp,
+			backend_users_roles ur
+		WHERE
+			p.id = rp.permission_id
+		AND rp.role_id = ur.role_id
+		AND p.available = 1
+		AND ur.user_id = #{userId}
+	</select>
+	
+	<!-- 查询权限列表的条件sql -->
+	<sql id="queryPermissionCondition">
+		<where>
+			1=1
+			<if test="description != null and description != ''">  
+		       and (
+		       		description like CONCAT('%',#{description},'%')
+		       		or 
+		       		permission like CONCAT('%',#{description},'%')
+		       )
+		    </if>  
+			<if test="permission != null and permission != ''">  
+		       and permission like CONCAT('%',#{permission},'%')
+		    </if>  
+		</where>
+	</sql>
+	
+	<!-- 分页查询权限列表 -->
+	<select id="selectByPage" parameterType="ltd.qcwifi.model.dto.param.PermissionParam" resultType="ltd.qcwifi.model.entity.Permission">
+		select * from backend_permissions
+		<include refid="queryPermissionCondition"/>
+		order by id desc
+	</select>
+	
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.Permission">
+		select * from backend_permissions where id=#{id}
+	</select>
+	
+	
+	
+	
+	<update id="update" parameterType="ltd.qcwifi.model.entity.Permission">
+		update 
+			backend_permissions
+		set
+			permission=#{permission},
+			description=#{description},
+			available=#{available}
+		where
+			id=#{id}
+	</update>
+	
+	<delete id="deleteRolePermission">
+		delete from backend_roles_permissions where permission_id=#{permissionId}
+	</delete>
+	<delete id="batchDelebteRolePermission">
+		delete from backend_roles_permissions where permission_id in
+		<foreach collection="list" item="p" index="index" open="(" close=")" separator=",">
+            #{p.id}
+        </foreach>
+	</delete>
+	
+	
+	<!-- ########		角色授权		############# -->
+	<select id="existOrNotPermission" resultType="ltd.qcwifi.model.entity.Permission">
+		SELECT
+			*
+		FROM
+			backend_permissions p
+		WHERE
+			p.id 
+			<if test="type == 'NOT'">  
+		       NOT
+		    </if> 
+			IN (
+				SELECT
+					rp.permission_id
+				FROM
+					backend_roles_permissions rp
+				WHERE
+					rp.role_id = #{roleId}
+			)
+		<if test="description != null and description != ''">  
+	       AND p.description LIKE CONCAT('%',#{description},'%')
+	    </if>  
+	</select>
+	
+	<!-- 移除角色的权限 -->
+	<delete id="uncorrelationPermissions">
+		delete from backend_roles_permissions where role_id = #{roleId} and permission_id in
+		<foreach collection="list" item="p" index="index" open="(" close=")" separator=",">
+			#{p.id}
+        </foreach>
+	</delete>
+	
+	<!-- 为角色授权 -->
+	<insert id="correlationPermissions">
+		insert into backend_roles_permissions(role_id,permission_id) values
+		<foreach collection="list" item="p" index="index" open="" close="" separator=",">
+			(#{roleId},#{p.id})
+        </foreach>
+	</insert>
+	
+</mapper>

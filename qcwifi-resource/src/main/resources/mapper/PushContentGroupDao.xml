@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.push.content.PushContentGroupDao">
+
+	<!-- 新增广告主 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into cloud_push_content_group(
+			name,
+			create_by,
+			create_time
+		) 
+		values(
+			#{name}, 
+			#{createBy},
+			now()
+		)
+	</insert>
+	
+	<!-- 根据user_id获取广告主-->
+	<select id="selectByUserId" resultType="ltd.qcwifi.model.entity.cloud.push.content.PushContentGroup">
+		select id,name from cloud_push_content_group where create_by=#{createBy}
+	</select>
+	
+	<!-- 根据groupId获取广告主-->
+	<select id="selectByGroupId" resultType="ltd.qcwifi.model.entity.cloud.push.content.PushContentGroup">
+		select id,name from cloud_push_content_group where id=#{groupId}
+	</select>
+
+	
+</mapper>

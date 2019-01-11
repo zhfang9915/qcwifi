@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="ltd.qcwifi.dao.jobs.JobsDao">
+	<!-- 添加任务 -->
+
+	<insert id="addJobs" parameterType="ltd.qcwifi.model.entity.jobs.Jobs">
+		insert into backend_jobs
+		(
+			id,
+			name,
+			schedual_time,
+			current_status,
+			class_name,
+			job_desc
+		)
+		values
+		(
+			#{id},
+			#{name},
+			#{schedualTime},
+			#{currentStatus},
+			#{className},
+			#{jobDesc}
+		);
+	</insert>
+	
+	<!-- 移除任务 -->
+	<delete id="removeJobs" parameterType="String">
+		delete from backend_jobs where id in (
+		<foreach collection="array" item="id" separator=",">
+			#{id}
+		</foreach>
+		)
+	</delete>
+
+	<!-- 更改任务 -->
+	<update id="updateJobs" parameterType="HashMap">
+		update backend_jobs
+		<set>
+			<if test="name!=null and name!=''">
+				name=#{name},
+			</if>
+			<if test="schedualTime!=null and schedualTime!=''">
+				schedual_time=#{schedualTime},
+			</if>
+			<if test="currentStatus!=null and currentStatus!=''">
+				current_status=#{currentStatus},
+			</if>
+			<if test="className!=null and className!=''">
+				class_name=#{className},
+			</if>
+			<if test="jobDesc!=null and jobDesc!=''">
+				job_desc=#{jobDesc}
+			</if>
+		</set>
+		<where>
+			id=#{id}
+		</where>
+	</update>
+
+	<!-- 根据fId查询任务 -->
+	<select id="searchJobsById" parameterType="String" resultType="ltd.qcwifi.model.entity.jobs.Jobs">
+		SELECT *
+		FROM backend_jobs
+		where id = #{id}
+	</select>
+	
+	<!-- 查询任务（模糊） -->
+	<select id="searchJobs" parameterType="ltd.qcwifi.model.dto.param.JobParam" resultType="ltd.qcwifi.model.entity.jobs.Jobs">
+		SELECT *
+		FROM backend_jobs
+		<where>
+			<if test="id!=null and id!=''">
+				and id=#{id}
+			</if>
+			<if test="name!=null and name!=''">
+				and name like CONCAT('%',#{name},'%')
+			</if>
+			<if test="currentStatus!=null and currentStatus!=''">
+				and current_status=#{currentStatus}
+			</if>
+		</where>
+	</select>
+
+</mapper>

@@ -1,0 +1,242 @@
+*{margin:0;padding:0;}
+.menu-top{
+	height: 31px;
+	border:1px solid #ccd6e0;
+	text-indent: 10px;
+	width: 100%;
+	padding-bottom: 5px;
+	background: #f8f9fb;
+	margin-bottom: 5px;
+}
+.menu-top .quick-btn button{
+	margin-top: 2px;
+	float: right;
+	margin-right: 3px;
+}
+.tree-left{
+	width: 220px;
+	float: left;
+	border:1px solid #ccd6e0;
+}
+.tree-left .menu-top{
+	 border-bottom: 1px solid #ccd6e0;
+	 border-top: none;
+	 border-left: none;
+	 border-right: none;
+}
+.tree-right{
+	width: calc(100% - 230px);
+	float: left;
+	margin-left:10px;
+	/* border:1px solid #ccd6e0; */
+	/*padding:0 0 10px 0;*/
+}
+.jstree-children ul li i{
+	color: #8f8d8d;
+}
+/* .dictionary-tab{
+	padding:0 5px;
+} */
+.menu-top  ul.quick-search{
+	height: 30px;
+	width: 67%;
+	float: left;
+	margin-top: 3px;
+}
+.menu-top  ul.quick-search li{
+	float: left;
+	width: 33%;
+}
+.menu-top  ul.quick-search li label{
+	display: block;
+	float: left;
+	font-weight: normal;
+	width:76px;
+	line-height: 24px;
+}
+.menu-top  ul.quick-search li input{
+	float: left;
+	width: 117px;
+	margin-top: 3px;
+}
+.menu-top .cont-btn-area{
+	width: 33%;
+	float: left;
+}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td{
+	font-weight: normal;
+}
+.table>thead>tr>th{
+	background: #f8f9fb;
+}
+.bootstrap-table .table, .bootstrap-table .table>tbody>tr>td, .bootstrap-table .table>tbody>tr>th, .bootstrap-table .table>tfoot>tr>td, .bootstrap-table .table>tfoot>tr>th, .bootstrap-table .table>thead>tr>td{
+	word-break: keep-all;
+	 white-space:nowrap; 
+	/*word-wrap:break-word;*/
+	/* table-layout:fixed; */
+	vertical-align: middle;
+}
+.bootstrap-table .table>tbody>tr>td:first-child{
+	text-align: center;
+}
+
+.dictionary-tab table{
+	/*    width: 1400px;
+    overflow-x: scroll;*/
+}
+.fixed-table-container tbody td .th-inner, .fixed-table-container thead th .th-inner{padding:5px;}
+.bootstrap-table .table, .bootstrap-table .table>tbody>tr>td, .bootstrap-table .table>tbody>tr>th, .bootstrap-table .table>tfoot>tr>td, .bootstrap-table .table>tfoot>tr>th, .bootstrap-table .table>thead>tr>td{padding:5px !important;}
+
+.marking_table .fixed-table-header{border-bottom: 0px;}
+.marking_table .fixed-table-footer, .fixed-table-header{
+	height: auto;
+}
+/*.bootstrap-table .columns{display: none;}*/
+.pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus{
+	background: #f9f9f9;
+	border-color: #ccd6e0;
+	color: #666;
+}
+.pagination>li>a:hover, .pagination>li>span:hover, .pagination>li>a:focus, .pagination>li>span:focus{color: #333;}
+.pagination>li>a, .pagination>li>span{color: #333;}
+.marking_table .fixed-table-pagination .pagination-detail, .fixed-table-pagination div.pagination{margin:0px;}
+.fixed-table-pagination .pagination-detail, .fixed-table-pagination div.pagination{margin: 7px 0 0 0}
+.list_dec li{
+	padding: 5px 0;
+	font-size: 12px;
+}
+.list_dec li span{
+	width: 60px;
+	text-align: right;
+	float: left;
+	display: inline-block;
+	margin-right: 10px;
+}
+.list_dec li input{
+	height: 24px;
+	line-height: 24px;
+	border:1px solid #ccc;
+	width: 202px;
+	text-indent: 7px;
+}
+.modal-footer button{
+	font-size: 12px;
+}
+.modal-header h4{
+	font-size: 14px;
+}
+.modal-footer,.modal-header{
+	padding:5px;
+	font-size: 12px;
+}
+@media (min-width: 768px){
+		.modal-dialog {
+	    width: 500px;
+	    margin: 30px auto;
+	}
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default{
+	background: #f8f9fb;
+}
+.ui-jqgrid tr.jqgrow td,.ui-jqgrid .ui-jqgrid-htable thead th{
+	padding:5px;
+}
+.ui-jqgrid .ui-jqgrid-htable thead th{
+/*	border:none;*/
+	color: #333;
+	font-weight: normal;
+}
+.ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr,.ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr{
+	border-radius: 0px;
+}
+.ui-jqgrid-htable thead tr th{
+	border-right: 1px solid #ddd;
+}
+.ui-jqgrid-htable thead tr {
+	border-bottom: 1px solid #ddd;
+}
+@media (min-width: 992px){
+	.modal-lg {
+    width: 900px;
+	}
+}
+/*marking model*/
+.marking_table .strategy,.marking_table .materials{
+	width: 45%;
+	float: left;
+	margin-top: 9px;
+}
+.marking_table .materials{
+	float: right;
+}
+.marking_table .addordel{
+	width: 10%;
+	float: left;
+	margin-top: 36px;
+}
+.marking_table .addordel button{
+	width: 90%;
+	margin: 35px 0 0 5px;
+}
+.marking_table .addordel button.add{
+	background: #00A2CA;
+	color: #fff;
+}
+.marking_table .addordel button.del{
+	background: #ff9900;
+	color: #fff;
+}
+.marking_table .strategy::after,.marking_table .materials::after,.marking_table .strategy::before,.marking_table .materials::before{
+	content: '';
+	display: table;
+	clear: both;
+}
+.marking_table .strategy p,.marking_table .materials p{
+	float: left;
+	margin-top: 2px;
+}
+.strategy .config,.materials .config{
+	width: 100%;
+	display: table;
+}
+.materials .config{
+	margin-top: 28px;
+}
+.strategy .config input,.strategy .config select,.materials .config input{
+	height: 22px;
+	line-height: 22px;
+	width: 153px;
+}
+.selected,.ui-state-highlight{
+	background: #dff0d8;
+}
+.ui-jqgrid tr.selected{
+	background: #dff0d8;
+}
+
+.add{
+    display: none;
+    width: 288px;
+    position: absolute;
+    border:1px solid #bababa;}
+  .add button{
+    text-align: left;
+    width: 100%;
+    height:25px;
+    border:none;
+    color: #000;
+    background: #fff;
+  }
+  .add button i{
+    width: 36px;
+    text-align: center;
+    font-size: 14px;
+    color: green
+  }
+  .add button:hover{
+    background: #ddd;
+  }
+  .add button:last-child i{
+    color: blue;
+  }

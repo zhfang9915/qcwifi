@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.system.RoleDao">
+	
+<!-- 	<cache eviction="LRU" type="ltd.qcwifi.resource.mybatis.redis.ecache.RedisCache" flushInterval="300000"/> -->
+	
+	<!-- 创建角色 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into backend_roles(role, description, available) 
+		values(#{role},#{description},#{available})
+	</insert>
+	
+	
+	
+	
+	<!-- 删除用户角色 -->
+	<delete id="deleteUserRole">
+		delete from backend_users_roles where role_id=#{roleId}
+	</delete>
+	<!-- 删除角色权限关系 -->
+	<delete id="deleteRolePermission">
+		delete from backend_roles_permissions where role_id=#{roleId}
+	</delete>
+	<!-- 删除角色 -->
+	<delete id="delete">
+		delete from backend_roles where id=#{id}
+	</delete>
+	
+	<!-- 批量删除角色关联的权限 -->
+	<delete id="batchDeleteRolePermission">
+		delete from backend_roles_permissions where role_id in
+		<foreach collection="list" item="r" index="index" open="(" close=")" separator=",">
+            #{r.id}
+        </foreach>
+	</delete>
+	<!-- 批量删除角色关联的用户 -->
+	<delete id="batchDeleteUserRole">
+		delete from backend_users_roles where role_id in
+		<foreach collection="list" item="r" index="index" open="(" close=")" separator=",">
+            #{r.id}
+        </foreach>
+	</delete>
+	<!-- 批量删除角色 -->
+	<delete id="batchDelete">
+		delete from backend_roles where id in
+		<foreach collection="list" item="r" index="index" open="(" close=")" separator=",">
+            #{r.id}
+        </foreach>
+	</delete>
+	
+	
+	
+	<!-- 根据用户id获取角色 -->
+	<select id="findRolesByUserId" resultType="java.lang.String">
+		SELECT
+			r.role
+		FROM
+			backend_roles r,
+			backend_users_roles ur
+		WHERE
+			r.id = ur.role_id
+		AND ur.user_id = #{userId, jdbcType=BIGINT}
+	</select>
+	
+	<!-- 查询权限列表的条件sql -->
+	<sql id="queryRolesCondition">
+		<where>
+			1=1
+			<if test="description != null and description != ''">  
+		       and (
+		       		role like CONCAT('%',#{role},'%')
+		       		or 
+		       		description like CONCAT('%',#{description},'%')
+		       )
+		    </if>  
+			<if test="role != null and role != ''">  
+		       and role like CONCAT('%',#{role},'%')
+		    </if>  
+		</where>
+	</sql>
+	
+	<!-- 分页查询权限列表 -->
+	<select id="selectByPage" parameterType="ltd.qcwifi.model.dto.param.RoleParam" resultType="ltd.qcwifi.model.entity.Role">
+		select * from backend_roles
+		<include refid="queryRolesCondition"/>
+		order by id desc
+	</select>
+	
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.Role">
+		select * from backend_roles where id=#{id}
+	</select>
+	
+	<update id="update" parameterType="ltd.qcwifi.model.entity.Role">
+		update 
+			backend_roles
+		set
+			role=#{role},
+			description=#{description},
+			available=#{available}
+		where
+			id=#{id}
+	</update>
+	
+	<!-- 根据权限ID查询角色ID -->
+	<select id="selectRoleIdByPermissionId" resultType="java.lang.Long" parameterType="java.lang.Long">
+		SELECT
+			rp.role_id
+		FROM
+			backend_roles_permissions rp
+		WHERE
+			rp.permission_id = #{permissionId}
+	</select>
+	
+	<!-- ########		角色授权		############# -->
+	<select id="existOrNotRole" resultType="ltd.qcwifi.model.entity.Role">
+		SELECT
+			*
+		FROM
+			backend_roles r
+		WHERE
+			r.id 
+			<if test="type == 'NOT'">  
+		       NOT
+		    </if> 
+			IN (
+				SELECT
+					ur.role_id
+				FROM
+					backend_users_roles ur
+				WHERE
+					ur.user_id = #{userId}
+			)
+		<if test="description != null and description != ''">  
+	       AND r.description LIKE CONCAT('%',#{description},'%')
+	    </if>  
+	</select>
+	
+	<!-- 移除用户的角色 -->
+	<delete id="uncorrelationRoles">
+		delete from backend_users_roles where user_id = #{userId} and role_id in
+		<foreach collection="list" item="r" index="index" open="(" close=")" separator=",">
+			#{r.id}
+        </foreach>
+	</delete>
+	
+	<!-- 为用户赋予角色 -->
+	<insert id="correlationRoles">
+		insert into backend_users_roles(user_id,role_id) values
+		<foreach collection="list" item="r" index="index" open="" close="" separator=",">
+			(#{userId},#{r.id})
+        </foreach>
+	</insert>
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.UserInfoAuthDao">
+
+	<!-- 查询 -->
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.UserInfoAuth">
+		select * from cloud_account_auth where user_id=#{id}
+	</select>
+
+	<!-- 新增用户资料认证 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into cloud_account_auth(
+			user_id,
+			status,
+			user_type,
+			company,
+			papers,
+			real_name,
+			id_card,
+			phone_num,
+			province,
+			city,
+			area,
+			qq
+		)
+		values(
+			#{userId},
+			0,
+			#{userType},
+			#{company},
+			#{papers},
+			#{realName},
+			#{idCard},
+			#{phoneNum},
+			#{province},
+			#{city},
+			#{area},
+			#{qq}
+		)
+	</insert>
+	
+</mapper>

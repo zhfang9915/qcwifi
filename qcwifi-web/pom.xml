@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>ltd.qcwifi</groupId>
+		<artifactId>qcwifi-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../qcwifi-parent</relativePath>
+	</parent>
+
+	<artifactId>qcwifi-web</artifactId>
+	<packaging>war</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>qcwifi-shiro</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>qcwifi-resource</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>weixin-java-open</artifactId>
+			<version>2.9.6.BETA</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>qcwifi-web</finalName>
+	</build>
+</project>

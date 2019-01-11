@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.push.content.AdsContentDao">
+
+	<!-- 获取用户名下的可推送广告信息 -->
+	<select id="queryAdsByCreateBy" resultType="ltd.qcwifi.model.entity.cloud.push.content.AdsContent">
+		SELECT
+			c.id,
+			c.weight,
+			t.is_more,
+			t.temp,
+			t.temp_js,
+			t.temp_for,
+			cc.imgs,
+			cc.urls
+		FROM
+			cloud_push_content c
+		LEFT JOIN cloud_push_content_choose cc ON c.id = cc.id
+		LEFT JOIN cloud_push_content_temp t ON cc.template_id = t.id
+		AND t.state = 'Y'
+		WHERE
+			c.create_by = #{createBy}
+		AND c.status = 1
+		AND c.day_limit > 0
+		AND c.total_limit > 0
+	</select>
+	
+	<!-- 获取前辰名下的可推送广告信息 -->
+	<select id="queryAdsForQcwifi" resultType="ltd.qcwifi.model.entity.cloud.push.content.AdsContent">
+		SELECT
+			c.weight,
+			t.is_more,
+			t.temp,
+			t.temp_js,
+			t.temp_for,
+			cc.imgs,
+			cc.urls
+		FROM
+			cloud_push_content c
+		LEFT JOIN backend_users_roles ur on ur.role_id=2 and c.create_by=ur.user_id
+		LEFT JOIN cloud_push_content_choose cc ON c.id = cc.id
+		LEFT JOIN cloud_push_content_temp t ON cc.template_id = t.id
+		AND t.state = 'Y'
+		WHERE c.`status` = 1
+		AND c.day_limit > 0
+		AND c.total_limit > 0
+	</select>
+	
+	<insert id="insertAdsSeq" parameterType="ltd.qcwifi.model.entity.cloud.push.content.AdsSeq">
+		INSERT IGNORE cloud_push_log (
+			logid,
+			ad_id,
+			devNo,
+			rdetail,
+			pmac,
+			surl,
+			stitle,
+			skeyword,
+			push,
+			shew,
+			click,
+			cloze
+		)
+		VALUES
+			(
+				#{logid},
+				#{adId},
+				#{devNo},
+				#{rdetail},
+				#{pmac},
+				#{surl},
+				#{stitle},
+				#{skeyword},
+				#{push},
+				#{shew},
+				#{click},
+				#{cloze}
+			);
+	</insert>
+	
+	<update id="updateAdsSeq" parameterType="ltd.qcwifi.model.entity.cloud.push.content.AdsSeq">
+		update 
+			cloud_push_log
+		set
+			logid=#{logid}
+			<if test="adId != null and adId != ''">
+				,ad_id=#{adId}
+			</if>
+			<if test="devNo != null and devNo != ''">
+				,devNo=#{devNo}
+			</if>
+			<if test="rdetail != null and rdetail != ''">
+				,rdetail=#{rdetail}
+			</if>
+			<if test="pmac != null and pmac != ''">
+				,pmac=#{pmac}
+			</if>
+			<if test="surl != null and surl != ''">
+				,surl=#{surl}
+			</if>
+			<if test="stitle != null and stitle != ''">
+				,stitle=#{stitle}
+			</if>
+			<if test="skeyword != null and skeyword != ''">
+				,skeyword#{skeyword}
+			</if>
+			<if test="push != null and push != ''">
+				,push=#{push}
+			</if>
+			<if test="shew != null and shew != ''">
+				,shew=#{shew}
+			</if>
+			<if test="click != null and click != ''">
+				,click=#{click}
+			</if>
+			<if test="cloze != null and cloze != ''">
+				,cloze=#{cloze}
+			</if>
+		where
+			logid=#{logid}
+	</update>
+</mapper>

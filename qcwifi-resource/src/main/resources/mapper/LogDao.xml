@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.system.LogDao">
+	
+	<!-- 保存API日志 -->
+	<insert id="insertApiLog" parameterType="ltd.qcwifi.model.entity.log.ApiLog">
+		insert into backend_log_apis(
+			id, request_date, ip, invoke_api, invoke_time, params, result, exception
+		) values (
+			#{id}, #{requestDate}, #{ip}, #{invokeApi}, #{invokeTime}, #{params}, #{result}, #{exception}
+		);
+	</insert>
+	
+	<!-- 查询api执行日志 -->
+	<select id="selectApiLog" resultType="ltd.qcwifi.model.entity.log.ApiLog">
+		SELECT
+			t.request_date,
+			t.ip,
+			t.invoke_api,
+			t.invoke_time,
+			t.params,
+			t.result,
+			t.exception
+		FROM
+			backend_log_apis t
+		<where>
+			<if test="invokeApi != null and invokeApi != ''">  
+				and t.invoke_api = #{invokeApi}
+			</if>
+			<if test="startTime != null and endTime != ''">  
+		       <![CDATA[
+			       and DATE_FORMAT(t.request_date,'%Y-%m-%d') >= #{startTime} 
+			       and DATE_FORMAT(t.request_date,'%Y-%m-%d') <= #{endTime}
+		       ]]>
+		    </if>
+	    </where>
+	    ORDER BY
+			t.request_date DESC
+	</select>
+	
+</mapper>

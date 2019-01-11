@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.ShopRouterDao">
+
+	<!-- 路由器信息创建 -->
+	<insert id="insert" parameterType="ltd.qcwifi.model.entity.cloud.platform.ShopRouter">
+		INSERT INTO cloud_shop_router (
+			dev_no,
+			mac,
+			version,
+			model,
+			fwv,
+			gccv,
+			fwid,
+			pv,
+			ssid2g,
+  			ssid2gb,
+  			ssid5g,
+  			ssid5gb
+		)
+		VALUE
+			(
+				#{devNo},
+				#{mac},
+				#{version},
+				#{model},
+				#{fwv},
+				#{gccv},
+				#{fwid},
+				#{pv},
+				#{ssid2g},
+	  			#{ssid2gb},
+	  			#{ssid5g},
+	  			#{ssid5gb}
+			) ON DUPLICATE KEY UPDATE 
+			fwv = #{fwv},
+			gccv = #{gccv},
+			fwid = #{fwid},
+			pv = #{pv},
+			ssid2g = #{ssid2g},
+  			ssid2gb = #{ssid2gb},
+  			ssid5g = #{ssid5g},
+  			ssid5gb = #{ssid5gb};
+	</insert>
+	
+	<!-- 路由器信息绑定 -->
+	<update id="binding" parameterType="ltd.qcwifi.model.entity.cloud.platform.ShopRouter">
+		UPDATE 
+			cloud_shop_router
+		SET
+			fwv = #{fwv},
+			gccv = #{gccv},
+			fwid = #{fwid},
+			pv = #{pv},
+			shop_id = #{shopId},
+			create_by = #{createBy}
+		WHERE
+			dev_no = #{devNo}
+	</update>
+	
+	<!-- 根据商铺获取设备信息 -->
+	<select id="selectByshop" resultType="ltd.qcwifi.model.entity.cloud.platform.ShopRouter">
+		SELECT
+			*
+		FROM
+			cloud_shop_router t
+		where
+			t.create_by = #{createBy} and t.shop_id = #{shopId}
+	</select>
+	
+	<!-- 根据设备号获取设备信息 -->
+	<select id="selectBydevNo" resultType="ltd.qcwifi.model.entity.cloud.platform.ShopRouter">
+		SELECT
+			*
+		FROM
+			cloud_shop_router t
+		where
+			t.dev_no = #{devNo}
+	</select>
+	
+	<!-- 根据设备号获取设备信息 -->
+	<select id="selectNoByMac" resultType="java.lang.String">
+		SELECT
+			t.dev_no
+		FROM
+			cloud_shop_router t
+		where
+			t.mac = #{mac}
+		limit 1;
+	</select>
+	
+	<update id="unbindingShop">
+		update cloud_shop_router set shop_id=null
+		where dev_no=#{devNo} and create_by=#{createBy} and shop_id=#{shopId} 
+	</update>
+	
+	
+	<!-- 分页查询列表 -->
+	<select id="selectByPage" parameterType="ltd.qcwifi.model.dto.param.RouterParam" resultType="ltd.qcwifi.model.entity.cloud.platform.ShopRouter">
+		select * from cloud_shop_router
+		<where>
+			1=1
+			<if test="codeId != null and codeId != ''">  
+		       and code_id like CONCAT('%',#{codeId},'%')
+		    </if>
+			<if test="codeName != null and codeName != ''">  
+		       and code_name like CONCAT('%',#{codeName},'%')
+		    </if>
+		</where>
+	</select>
+</mapper>

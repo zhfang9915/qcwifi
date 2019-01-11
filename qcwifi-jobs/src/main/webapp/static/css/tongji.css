@@ -1,0 +1,19 @@
+.tongji .tabhead h2{
+	font-size: 14px;
+	font-weight: bold;
+}
+.tongjitab table tr td,.tongjitab table tr th{
+	font-weight: normal;
+}
+.start_date{
+	margin-top: 15px;
+}
+.start_date input{
+	height: 26px;
+	line-height: 26px;
+	color: #555555;
+    vertical-align: middle;
+    background-color: #ffffff;
+    background-image: none;
+    border: 1px solid #cccccc;
+}

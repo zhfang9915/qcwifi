@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.platform.ExtensionTemplateDao">
+
+	
+	<!-- ######################		基础操作		######################### -->
+	<!-- 新增推送模版 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into backend_extension_template(
+			name, 
+			available, 
+			is_more, 
+			temp, 
+			temp_for, 
+			temp_js,
+			create_by, 
+			create_time
+		) 
+		values(
+			#{name},
+			#{available},
+			#{isMore}, 
+			#{temp}, 
+			#{tempFor}, 
+			#{tempJs},
+			#{createBy}, 
+			now()
+		)
+	</insert>
+	
+	<!-- 删除推送模版 -->
+	<delete id="delete">
+		delete from backend_extension_template where id=#{id}
+	</delete>
+	
+	<!-- 批量删除推送模版 -->
+	<delete id="batchDelete">
+		delete from backend_extension_template where id in
+		<foreach collection="list" item="t" index="index" open="(" close=")" separator=",">
+            #{t.id}
+        </foreach>
+	</delete>
+	
+	<!-- 根据ID获取推送模版 -->
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.cloud.platform.ExtensionTemplate">
+		select * from backend_extension_template where id=#{id}
+	</select>
+	
+	<!-- 查询条件sql -->
+	<sql id="queryByPagesCondition">
+		<where>
+			1=1
+			<if test="name != null and name != ''">  
+		       and name like CONCAT('%',#{name},'%')
+		    </if>  
+			<if test="isMore != null and isMore != ''">  
+		       and is_more = #{isMore, jdbcType=TINYINT}
+		    </if>  
+			<if test="available != null and available != ''">  
+		       and available = #{available, jdbcType=TINYINT}
+		    </if>  
+		</where>
+	</sql>
+	
+	<!-- 分页查询插件列表 -->
+	<select id="selectByPage" parameterType="ltd.qcwifi.model.dto.param.ExtensionTemplateParam" resultType="ltd.qcwifi.model.entity.cloud.platform.ExtensionTemplate">
+		select * from backend_extension_template
+		<include refid="queryByPagesCondition"/>
+		order by create_time desc
+	</select>
+	
+	<update id="update" parameterType="ltd.qcwifi.model.entity.cloud.platform.ExtensionTemplate">
+		update 
+			backend_extension_template
+		set
+			name=#{name},
+			available=#{available},
+			is_more=#{isMore},
+			temp=#{temp},
+			temp_for=#{tempFor},
+			temp_js=#{tempJs}
+		where
+			id=#{id}
+	</update>
+	
+	
+</mapper>

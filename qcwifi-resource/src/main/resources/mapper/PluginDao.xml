@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.qcwifi.dao.cloud.platform.PluginDao">
+
+	<!-- ######################		基础操作		######################### -->
+	<!-- 新增插件 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		insert into backend_plugin(
+			name, 
+			description, 
+			version, 
+			crosstool, 
+			res_path, 
+			available,
+			download_url,
+			md5,
+			remark, 
+			create_by, 
+			create_time
+		) 
+		values(
+			#{name},
+			#{description},
+			#{version}, 
+			#{crosstool}, 
+			#{resPath}, 
+			#{available},
+			#{downloadUrl},
+			#{md5},
+			#{remark}, 
+			#{createBy}, 
+			now()
+		)
+	</insert>
+	
+	<!-- 删除插件 -->
+	<delete id="delete">
+		delete from backend_plugin where id=#{id}
+	</delete>
+	
+	<!-- 批量删除插件 -->
+	<delete id="batchDelete">
+		delete from backend_plugin where id in
+		<foreach collection="list" item="p" index="index" open="(" close=")" separator=",">
+            #{p.id}
+        </foreach>
+	</delete>
+	
+	<!-- 根据ID获取插件 -->
+	<select id="selectOneById" resultType="ltd.qcwifi.model.entity.cloud.platform.Plugin">
+		select * from backend_plugin where id=#{id}
+	</select>
+	
+	<!-- 查询权限列表的条件sql -->
+	<sql id="queryPluginsCondition">
+		<where>
+			1=1
+			<if test="version != null and version != ''">  
+		       and version like CONCAT('%',#{version},'%')
+		    </if>  
+			<if test="crosstool != null and crosstool != ''">  
+		       and crosstool like CONCAT('%',#{crosstool},'%')
+		    </if>  
+			<if test="available != null and crosstool != ''">  
+		       and available = #{available, jdbcType=TINYINT}
+		    </if>  
+		</where>
+	</sql>
+	
+	<!-- 分页查询插件列表 -->
+	<select id="selectByPage" parameterType="ltd.qcwifi.model.dto.param.PluginParam" resultType="ltd.qcwifi.model.entity.cloud.platform.Plugin">
+		select * from backend_plugin
+		<include refid="queryPluginsCondition"/>
+		order by create_time desc
+	</select>
+	
+	<update id="update" parameterType="ltd.qcwifi.model.entity.cloud.platform.Plugin">
+		update 
+			backend_plugin
+		set
+			version=#{version},
+			crosstool=#{crosstool},
+			available=#{available}
+		where
+			id=#{id}
+	</update>
+	
+	<!-- ######################		扩展操作		######################### -->
+	
+	<!-- 根据MD5获取插件信息 -->
+	<select id="selectOneByMD5" resultType="ltd.qcwifi.model.entity.cloud.platform.Plugin">
+		select * from backend_plugin where md5=#{md5}
+	</select>
+	
+	<select id="selectByGccv" resultType="ltd.qcwifi.model.entity.cloud.platform.Plugin">
+		select * from backend_plugin where crosstool=#{gccv}
+	</select>
+	
+</mapper>
